@@ -1,18 +1,22 @@
+
 services:
-  clickhouse:
-    image: 'clickhouse/clickhouse-server:25.5-alpine'
-    container_name: 'clickhouse-rs-clickhouse-server'
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - '18123:8123'
-      - '19000:9000'
+      - "8080:8080"
+    depends_on:
+      - mongo
+
+  mongo:
+    build:
+      context: docker
+      dockerfile: mongo.Dockerfile
     environment:
-      - CLICKHOUSE_USER=click
-      - CLICKHOUSE_PASSWORD=click
-    ulimits:
-      nofile:
-        soft: 262144
-        hard: 262144
+      - MONGO_INITDB_DATABASE=events
+    ports:
+      - "27017:27017"
     volumes:
-      - ./clickhouse_data:/var/lib/clickhouse
-      # - ./clickhouse_config:/etc/clickhouse-server/config.d
-      # - ./clickhouse_users:/etc/clickhouse-server/users.d
+      - ./.mongo:/data/db
+    restart: always

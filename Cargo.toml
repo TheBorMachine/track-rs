@@ -7,7 +7,9 @@ edition = "2024"
 anyhow = "1.0.98"
 axum = "0.8.4"
 chrono = "0.4.41"
-clickhouse = "0.13.3"
+env_logger = "0.11.8"
+log = "0.4.28"
+mongodb = "3.3.0"
 serde = { version = "1.0.219", features = ["derive"] }
 tokio = { version = "1.46.1", features = ["full"] }
 tower-http = { version = "0.6.6", features = ["cors"] }
