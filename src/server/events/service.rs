@@ -1,23 +1,27 @@
-use axum::{Json, extract::State};
-
-use crate::server::events::repository;
+use axum::{Json, extract::State, http::StatusCode};
+use tokio::sync::mpsc;
 
 use super::models;
 
 pub async fn create(
-    State(repository): State<repository::Events>,
+    State(sender): State<mpsc::Sender<models::Event>>,
     Json(event): Json<models::Event>,
-) {
-    match repository.create(&event).await {
-        () => log::info!("OK"),
+) -> StatusCode {
+    match sender.send(event).await {
+        Ok(_) => StatusCode::CREATED,
+        Err(_) => StatusCode::INTERNAL_SERVER_ERROR,
     }
 }
 
 pub async fn create_many(
-    State(repository): State<repository::Events>,
+    State(sender): State<mpsc::Sender<models::Event>>,
     Json(events): Json<Vec<models::Event>>,
-) {
-    match repository.create_many(&events).await {
-        () => log::info!("OK"),
+) -> StatusCode {
+    for event in events {
+        _ = match sender.send(event).await {
+            Ok(_) => StatusCode::CREATED,
+            Err(_) => StatusCode::INTERNAL_SERVER_ERROR,
+        }
     }
+    StatusCode::CREATED
 }

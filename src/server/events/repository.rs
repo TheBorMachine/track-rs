@@ -1,6 +1,5 @@
 use super::models;
 
-#[derive(Clone)]
 pub struct Events {
     collection: mongodb::Collection<models::Event>,
 }
